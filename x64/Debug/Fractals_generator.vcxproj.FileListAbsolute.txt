@@ -1,1 +1,0 @@
-C:\Users\tom\Documents\programation\c++\projects\Fractals_generator\x64\Debug\Fractals_generator.exe

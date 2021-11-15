@@ -1,2 +1,0 @@
-﻿  main.cpp
-C:\Users\tom\Documents\programation\c++\projects\Fractals_generator\main.h(4,10): fatal error C1083: Impossible d'ouvrir le fichier include : 'SFML/Graphics.hpp' : No such file or directory
