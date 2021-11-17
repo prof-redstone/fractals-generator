@@ -1,6 +1,17 @@
 
+//les includes
+#include <SFML/Graphics.hpp>
+#include <iostream>
+#include <vector>
+#include <cmath>
+
+
+//constantes
+const int WIN_WIDTH = 900;
+const int WIN_HEIGHT = 900;
 //include
 #include "main.h"
+#include "simulation.h"
 
 
 //name space
@@ -15,8 +26,8 @@ void SetText(Text& txt, string str, Color col, int size);
 void UpdateImage(RenderWindow& window);
 Image renderMandelbrotSet(RenderWindow& window);
 double mapScale(double const& val, double const& x0, double const& x1, double const& y0, double const& y1);
-Color colorOfNumber(int const& valI);
-Color colorWheel(double hueI, double const satI, double const darkI, double const alphaI);
+Color colorOfNumber(int const& valI, int const& val2I);
+Color colorWheel(double hueI, double const satI =1, double const darkI =1, double const alphaI = 1);
 
 //variable
 Font font; //from sfml
@@ -147,9 +158,12 @@ void UpdateImage(RenderWindow& window) {
 Image renderMandelbrotSet(RenderWindow& window) {
     int width = window.getSize().x;
     int height = window.getSize().y;
-    double default_value = 0;
+    int default_value = 0;
     vector<int> v(width, default_value);
     vector<vector<int>> array(height, v);
+    double default_value2 = 0;
+    vector<int> v2(width, default_value);
+    vector<vector<int>> array2(height, v);
 
     Image image;
     //création d'une image avec uin fond noir par defaut
@@ -165,7 +179,6 @@ Image renderMandelbrotSet(RenderWindow& window) {
             double b = y;
             int n = 0;
 
-            double smoothcolor = exp(-sqrt(a*a + b*b));
 
             while (n < maxIteration && a*a + b*b <= limit) {
                 //double newa = ;
@@ -179,8 +192,10 @@ Image renderMandelbrotSet(RenderWindow& window) {
                 n++;
             }
 
-
+            array[i][j] = n;
+            array2[i][j] = sqrt(a * a + b * b);
             
+            /*
             double bright = mapScale(n, 1, maxIteration, 0, 1);
             bright = mapScale(bright, 0, 1, 0, 255);
 
@@ -189,6 +204,7 @@ Image renderMandelbrotSet(RenderWindow& window) {
                 bright = 0;
             }
             array[i][j] = bright;
+            */
         }
     }
 
@@ -196,7 +212,7 @@ Image renderMandelbrotSet(RenderWindow& window) {
     for (unsigned int i = 0; i < window.getSize().x; i++) {
         for (unsigned int j = 0; j < window.getSize().y; j++)
         {
-            image.setPixel(i, j, colorOfNumber(array[i][j]));
+            image.setPixel(i, j, colorOfNumber(array[i][j], array2[i][j] ));
         }
     }
 
@@ -209,16 +225,17 @@ double mapScale(double const &val, double const &x0, double const &x1, double co
 }
 
 
-Color colorOfNumber(int const &valI) {
-    double val = valI ;
+Color colorOfNumber(int const &valI, int const& val2I) {
+    double val = valI + 1 - log(log(val2I)) / log(2);
+    //double val = valI ;
     Color color;
-    color = colorWheel(sqrt(val)/3+4, 0.2, 1, 1);
+    color = colorWheel(val*0.02, 0.1, 1);
     //color = Color(static_cast<unsigned int>(255*cos(val+1)), static_cast<unsigned int>(255 * cos(val+2)), static_cast<unsigned int>(255 * cos(val)), 255);
 
     return color;
 }
 
-Color colorWheel(double hueI = 0, double const satI = 0, double const darkI = 1, double const alphaI = 1) {
+Color colorWheel(double hueI , double const satI , double const darkI , double const alphaI) {
     /*
     hue :
     0 : red
