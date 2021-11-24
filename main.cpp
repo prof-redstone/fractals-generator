@@ -4,22 +4,13 @@
 #include <iostream>
 #include <vector>
 #include <cmath>
-
-
-//constantes
-const int WIN_WIDTH = 900;
-const int WIN_HEIGHT = 900;
-//include
 #include "main.h"
 #include "simulation.h"
-
-
 //name space
 using namespace sf;
 using namespace std;
 
-
-//prtotypes des fonctions
+//prototypes des fonctions
 void InputHandler(sf::Event event, sf::RenderWindow& window);
 void loadFont();
 void SetText(Text& txt, string str, Color col, int size);
@@ -29,49 +20,63 @@ double mapScale(double const& val, double const& x0, double const& x1, double co
 Color colorOfNumber(int const& valI, int const& val2I);
 Color colorWheel(double hueI, double const satI =1, double const darkI =1, double const alphaI = 1);
 
+//constantes
+const int WIN_WIDTH = 900;
+const int WIN_HEIGHT = 900;
+
 //variable
 Font font; //from sfml
 
+/*
 int FractalType = 1;//1 = mandelbrot 2=Julia
-
 int maxIteration = 150;
-float limit = 4;
+float limit = 16;
 double zoomScale = 1;
 double centerX = -0.5;
-double centerY = 0;
+double centerY = 0;*/
+Simulation simulation;
 
 int main()
 {
     cout << "demarrage de l'application" << endl;
     //creation de la fenetre
     RenderWindow window(VideoMode(WIN_WIDTH, WIN_HEIGHT, 32), "Fractal Generator");
+    window.setKeyRepeatEnabled(false);//pour éviter les trucs bisard quand on utilise sur le clavier
     //activation Vsinc
     window.setVerticalSyncEnabled(true);
     //chargement de la font pour pouvoir afficher des chose
     loadFont();
 
     
+    simulation.updateWindow(window);
+    simulation.simulate();
 
     while (window.isOpen()) {
         //gestion des inputs et des events
         Event event;
-        while (window.pollEvent(event)) {
-            InputHandler(event, window);
+        bool needToReSimulate = false;
+        while (window.pollEvent(event)) { //tant qu'on a un evenement on le boucle
+            if (simulation.inputHandler(event, window) == 1) //gère les evenement et en fonction des evenement resumuler la fractal
+            {
+                needToReSimulate = true;
+            }
         }
+        if (needToReSimulate) { simulation.simulate(); }
         //couleur du font de la fenetre
         window.clear(Color::Black);
 
-        UpdateImage(window);
+        //simulation.simulate();
+        simulation.render(window);
+        //UpdateImage(window);
 
         window.display();
     }
     return 0;
 }
 
-
 //gestion des inputs et des evenements
 void InputHandler(Event event, RenderWindow& window) {
-    if (event.type == Event::Closed) {
+    /*if (event.type == Event::Closed) {
         window.close();
     }
     if (event.type == Event::MouseButtonPressed) {
@@ -114,6 +119,7 @@ void InputHandler(Event event, RenderWindow& window) {
             cout << "limite " << to_string(limit) << endl;
         }
     }
+    */
 }
 
 //charger la police d'ecriture
@@ -133,6 +139,7 @@ void SetText(Text& txt, string str = "", Color col = Color::White, int size = 26
     txt.setCharacterSize(size);
 }
 
+/*
 void UpdateImage(RenderWindow& window) {
     //image compose la texture qui compose le sprite, puis on affiche le sprite
     Image image;
@@ -162,9 +169,8 @@ Image renderMandelbrotSet(RenderWindow& window) {
     vector<int> v(width, default_value);
     vector<vector<int>> array(height, v);
     double default_value2 = 0;
-    vector<int> v2(width, default_value);
-    vector<vector<int>> array2(height, v);
-
+    vector<double> v2(width, default_value);
+    vector<vector<double>> array2(height, v2);
     Image image;
     //création d'une image avec uin fond noir par defaut
     image.create(width, height, Color::Black);
@@ -195,16 +201,6 @@ Image renderMandelbrotSet(RenderWindow& window) {
             array[i][j] = n;
             array2[i][j] = sqrt(a * a + b * b);
             
-            /*
-            double bright = mapScale(n, 1, maxIteration, 0, 1);
-            bright = mapScale(bright, 0, 1, 0, 255);
-
-
-            if (n == maxIteration) {
-                bright = 0;
-            }
-            array[i][j] = bright;
-            */
         }
     }
 
@@ -234,59 +230,39 @@ Color colorOfNumber(int const &valI, int const& val2I) {
 
     return color;
 }
+*/
 
 Color colorWheel(double hueI , double const satI , double const darkI , double const alphaI) {
-    /*
-    hue :
-    0 : red
-    1 : yellow
-    2 : green
-    3 : cyan
-    4 : blue
-    5 : purple
-    6 : red
-    hue  0 == 6   6 is one cycle rotation
+    
+    //hue : 0 : red  1 : yellow  2 : green  3 : cyan  4 : blue  5 : purple  6 : red
+    //hue  0 == 6   6 is one cycle rotation
+    //saturation [0;1]
+    //darkness [0;1]
+    //alpha [0;1]
 
-    saturation [0;1]
-    darkness [0;1]
-    alpha [0;1]
 
-    */
-
-    double red=0;
-    double green=0;
-    double blue=0;
-    double hue = fmod(hueI,6);
+    double red = 0;
+    double green = 0;
+    double blue = 0;
+    double hue = fmod(hueI, 6);
 
     if (hue >= 0 && hue < 1) {
-        red = 255;
-        green = hue * 255;
-        blue = 0;
+        red = 255; green = hue * 255; blue = 0;
     }
     else if (hue >= 1 && hue < 2) {
-        green = 255;
-        red = 255 - ((hue - 1) * 255);
-        blue = 0;
+        green = 255; red = 255 - ((hue - 1) * 255); blue = 0;
     }
     else if (hue >= 2 && hue < 3) {
-        green = 255;
-        blue = (hue - 2) * 255;
-        red = 0;
+        green = 255; blue = (hue - 2) * 255; red = 0;
     }
     else if (hue >= 3 && hue < 4) {
-        blue = 255;
-        green = 255 - ((hue - 3) * 255);
-        red = 0;
+        blue = 255; green = 255 - ((hue - 3) * 255); red = 0;
     }
     else if (hue >= 4 && hue < 5) {
-        blue = 255;
-        red = (hue - 4) * 255;
-        green = 0;
+        blue = 255; red = (hue - 4) * 255; green = 0;
     }
     else if (hue >= 5 && hue < 6) {
-        red = 255;
-        blue = 255 - ((hue - 5) * 255);
-        green = 0;
+        red = 255; blue = 255 - ((hue - 5) * 255); green = 0;
     }
 
     red = red + (255 - red) * satI;
@@ -299,3 +275,4 @@ Color colorWheel(double hueI , double const satI , double const darkI , double c
 
     return Color(static_cast<Uint8>(red), static_cast<Uint8>(green), static_cast<Uint8>(blue), static_cast<Uint8>(alphaI*255));
 }
+
