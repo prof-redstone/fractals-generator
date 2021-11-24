@@ -255,6 +255,7 @@ int Simulation::inputHandler(Event event, sf::RenderWindow& window){
 	return 0;
 }
 
+//assigne color base on a float number
 sf::Color Simulation::colorOfNumber(int const& valI, int const& val2I) {
 	double val = valI + 1 - log(log(val2I)) / log(2);
 	//double val = valI ;
@@ -265,6 +266,7 @@ sf::Color Simulation::colorOfNumber(int const& valI, int const& val2I) {
 	return color;
 }
 
+//simply converte color to HSL mode to RGB mode
 sf::Color Simulation::HSLtoRGB(double hueI, double const satI, double const darkI, double const alphaI)
 {
 	//hue : 0 : red  1 : yellow  2 : green  3 : cyan  4 : blue  5 : purple  6 : red

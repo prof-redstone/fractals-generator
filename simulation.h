@@ -36,11 +36,12 @@ public:
 
 	int inputHandler(sf::Event event, sf::RenderWindow& win);
 
-
+	//map number to a scale to another 
 	static double mapScale(double const& val, double const& x0, double const& x1, double const& y0, double const& y1) {
 		return ((y1 - y0) / (x1 - x0)) * (val - x0) + y0;
 	}
 
+	//tools function
 	static sf::Color colorOfNumber(int const& valI, int const& val2I);
 	static sf::Color HSLtoRGB(double hueI, double const satI, double const darkI, double const alphaI=1);
 };
