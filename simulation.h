@@ -4,6 +4,8 @@
 #include <iostream>
 #include <vector>
 #include <cmath>
+#include <sstream>//for larger precision with to_string(double)
+#include <iomanip>//for larger precision with to_string(double)
 
 class Simulation {
 public:
@@ -14,15 +16,18 @@ public:
 	std::vector<std::vector<int>> pixelNcount; //nb d'iteration avant que ça diverge
 	std::vector<std::vector<double>> pixelVal; //modulo de la valeur à la divergence (pour avoir un truc plus lisse)
 	uint8_t fractalType; //juste mandelbrot for the moment (0)
+	int win_width;//taille de la window
+	int win_height;
 	int maxIteration;
 	float limit;
-	double zoomScale;
-	double posX;
+	double zoomScale; //niveau de zoom
+	double posX; //postion du milieu de l'ecran sur la fractal
 	double posY;
-	int win_width;
-	int win_height;
-	double JuliaX;
+	double JuliaX; //coordonné de fractal Julia
 	double JuliaY;
+	double posJuliaX; //postion du milieu de l'ecran sur la fractal
+	double posJuliaY;
+	double zoomScaleJulia;
 
 	Simulation();
 	Simulation(sf::RenderWindow& win);

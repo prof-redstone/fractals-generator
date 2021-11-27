@@ -13,6 +13,9 @@ Simulation::Simulation() {
 	posY = 0;
 	JuliaX = -0.5;
 	JuliaY = -0.5;
+	posJuliaX = 0; //postion du milieu de l'ecran sur la fractal
+	posJuliaY = 0;
+	zoomScaleJulia = 0.001;
 	win_width = 100;//use update window to change
 	win_height = 100;//use update window to change
 	image.create(win_width, win_height, Color::Cyan);
@@ -38,6 +41,9 @@ Simulation::Simulation(sf::RenderWindow& win) {
 	posY = 0;
 	JuliaX = 0;
 	JuliaY = 0;
+	posJuliaX = 0; //postion du milieu de l'ecran sur la fractal
+	posJuliaY = 0;
+	zoomScaleJulia = 0.001;
     win_width = win.getSize().x; //ici
     win_height = win.getSize().y;
 	image.create(win_width, win_height, Color::Black);
@@ -104,6 +110,18 @@ void Simulation::render(sf::RenderWindow& win) {
 		sprite.setTexture(texture,false);
 
 		win.draw(sprite);
+		string title;
+		std::ostringstream streamObj;//for better precision to convert double into string
+		if (fractalType == 0)
+		{
+			streamObj << std::fixed << std::setprecision(12) << "Mandelbrot : pos: " << posX << "; " << posY << "i; zoom : " << std::setprecision(3) << (1/(zoomScale*1000)) ;
+			title = streamObj.str();
+		}
+		else if (fractalType == 1) {
+			streamObj << std::fixed << std::setprecision(12) << "Julia : C: " << JuliaX << ";" << JuliaY << "i; pos: " << posJuliaX << "; " << posJuliaY << "i; zoom : " << std::setprecision(3) << (1 / (zoomScaleJulia * 1000));
+			title = streamObj.str();
+		}
+		win.setTitle(title);
 	}
 }
 
@@ -111,7 +129,7 @@ void Simulation::render(sf::RenderWindow& win) {
 void Simulation::simulate() {
 	cout << "start simulate";
 
-	if (fractalType == 0){
+	if (fractalType == 0){ //Mandelbrot set
 		for (int i = 0; i < win_width; i++)
 		{
 
@@ -139,15 +157,16 @@ void Simulation::simulate() {
 			}
 		}
 	}
-	else if (fractalType == 1) {
+	else if (fractalType == 1) { //Julia set
+		cout << posJuliaY << endl;
 		for (int i = 0; i < win_width; i++)
 		{
 			for (int j = 0; j < win_height; j++) {
-				double x = Simulation::mapScale(j, 0, win_height, -zoomScale + posX, zoomScale + posX);
-				double y = Simulation::mapScale(i, 0, win_width, -zoomScale + posY, zoomScale + posY);
+				double x = Simulation::mapScale(i, 0, win_width, (-zoomScaleJulia * static_cast<float>(win_width) + posJuliaX), (zoomScaleJulia * static_cast<float>(win_width) + posJuliaX));
+				double y = Simulation::mapScale(j, 0, win_height, (-zoomScaleJulia * static_cast<float>(win_height) + posJuliaY), (zoomScaleJulia * static_cast<float>(win_height) + posJuliaY));
 
-				double a = x + JuliaX; //partie reel
-				double b = y + JuliaY; //partie imaginaire
+				double a = x ; //partie reel
+				double b = y ; //partie imaginaire
 				int n = 0; //nombre d'iteration
 
 
@@ -186,21 +205,41 @@ int Simulation::inputHandler(Event event, sf::RenderWindow& window){
 		//zoom in 
 		if (event.mouseButton.button == Mouse::Left)
 		{
-			Mouse mouse;
-			cout << "zoom " << 1 / zoomScale << endl;
-			posX = mapScale(mouse.getPosition(window).x, 0, window.getSize().x, (-zoomScale * static_cast<float>(win_width) + posX), (zoomScale * static_cast<float>(win_width) + posX));
-			posY = mapScale(mouse.getPosition(window).y, 0, window.getSize().y, (-zoomScale * static_cast<float>(win_height) + posY), (zoomScale * static_cast<float>(win_height) + posY));
-			zoomScale /= 1.5;
+			if (fractalType == 0)
+			{
+				Mouse mouse;
+				cout << "zoom " << 1 / zoomScale << endl;
+				posX = mapScale(mouse.getPosition(window).x, 0, window.getSize().x, (-zoomScale * static_cast<float>(win_width) + posX), (zoomScale * static_cast<float>(win_width) + posX));
+				posY = mapScale(mouse.getPosition(window).y, 0, window.getSize().y, (-zoomScale * static_cast<float>(win_height) + posY), (zoomScale * static_cast<float>(win_height) + posY));
+				zoomScale /= 1.5;
+			}
+			else {
+				Mouse mouse;
+				cout << "zoom " << 1 / zoomScaleJulia << endl;
+				posJuliaX = mapScale(mouse.getPosition(window).x, 0, window.getSize().x, (-zoomScaleJulia * static_cast<float>(win_width) + posJuliaX), (zoomScaleJulia * static_cast<float>(win_width) + posJuliaX));
+				posJuliaY = mapScale(mouse.getPosition(window).y, 0, window.getSize().y, (-zoomScaleJulia * static_cast<float>(win_height) + posJuliaY), (zoomScaleJulia * static_cast<float>(win_height) + posJuliaY));
+				zoomScaleJulia /= 1.5;
+			}
 			NeedToSimulate = true;
 		}
 		//zoom out
 		if (event.mouseButton.button == Mouse::Right)
 		{
-			Mouse mouse;
-			cout << "zoom " << 1 / zoomScale << endl;
-			posX = mapScale(mouse.getPosition(window).x, 0, window.getSize().x, (-zoomScale * static_cast<float>(win_width) + posX), (zoomScale * static_cast<float>(win_width) + posX));
-			posY = mapScale(mouse.getPosition(window).y, 0, window.getSize().y, (-zoomScale * static_cast<float>(win_height) + posY), (zoomScale * static_cast<float>(win_height) + posY));
-			zoomScale *= 1.5;
+			if (fractalType == 0)
+			{
+				Mouse mouse;
+				cout << "zoom " << 1 / zoomScale << endl;
+				posX = mapScale(mouse.getPosition(window).x, 0, window.getSize().x, (-zoomScale * static_cast<float>(win_width) + posX), (zoomScale * static_cast<float>(win_width) + posX));
+				posY = mapScale(mouse.getPosition(window).y, 0, window.getSize().y, (-zoomScale * static_cast<float>(win_height) + posY), (zoomScale * static_cast<float>(win_height) + posY));
+				zoomScale *= 1.5;
+			}
+			else {
+				Mouse mouse;
+				cout << "zoom " << 1 / zoomScaleJulia << endl;
+				posJuliaX = mapScale(mouse.getPosition(window).x, 0, window.getSize().x, (-zoomScaleJulia * static_cast<float>(win_width) + posJuliaX), (zoomScaleJulia * static_cast<float>(win_width) + posJuliaX));
+				posJuliaY = mapScale(mouse.getPosition(window).y, 0, window.getSize().y, (-zoomScaleJulia * static_cast<float>(win_height) + posJuliaY), (zoomScaleJulia * static_cast<float>(win_height) + posJuliaY));
+				zoomScaleJulia *= 1.5;
+			}
 			NeedToSimulate = true;
 		}
 	}
@@ -235,6 +274,20 @@ int Simulation::inputHandler(Event event, sf::RenderWindow& window){
 		if (event.key.code == Keyboard::LControl)
 		{
 			cout << "controle !" << endl;
+			if (fractalType == 0)
+			{
+				posJuliaX = 0; //postion du milieu de l'ecran sur la fractal
+				posJuliaY = 0;
+				zoomScaleJulia = 0.001;
+				Mouse mouse;
+				JuliaX = mapScale(mouse.getPosition(window).x, 0, window.getSize().x, (-zoomScale * static_cast<float>(win_width) + posX), (zoomScale * static_cast<float>(win_width) + posX));
+				JuliaY = mapScale(mouse.getPosition(window).y, 0, window.getSize().y, (-zoomScale * static_cast<float>(win_height) + posY), (zoomScale * static_cast<float>(win_height) + posY));
+				fractalType = 1;
+			}
+			else {
+				fractalType = 0;
+			}
+			NeedToSimulate = true;
 		}
 	}
 	//window change size event to adapte image to window
