@@ -8,7 +8,7 @@ Simulation::Simulation() {
 	fractalType = 0;
 	maxIteration = 100;
 	limit = 16;
-	zoomScale = 1;
+	zoomScale = 0.001;
 	posX = -0.5;
 	posY = 0;
 	JuliaX = -0.5;
@@ -33,7 +33,7 @@ Simulation::Simulation(sf::RenderWindow& win) {
 	fractalType = 1;
 	maxIteration = 100;
 	limit = 16;
-	zoomScale = 1;
+	zoomScale = 0.01;
 	posX = -0.5;
 	posY = 0;
 	JuliaX = 0;
@@ -116,8 +116,9 @@ void Simulation::simulate() {
 		{
 
 			for (int j = 0; j < win_height; j++) {
-				double x = Simulation::mapScale(i, 0, win_width, (-zoomScale + posX) * (static_cast<float>(win_width) / static_cast<float>(win_height)), (zoomScale  + posX) * (static_cast<float>(win_width) / static_cast<float>(win_height)));
-				double y = Simulation::mapScale(j, 0, win_height, (-zoomScale + posY) , (zoomScale + posY) );
+				// * (static_cast<float>(win_width) / static_cast<float>(win_height))
+				double x = Simulation::mapScale(i , 0, win_width, (-zoomScale*static_cast<float>(win_width ) + posX), (zoomScale*static_cast<float>(win_width ) + posX));
+				double y = Simulation::mapScale(j, 0, win_height, (-zoomScale * static_cast<float>(win_height) + posY) , (zoomScale * static_cast<float>(win_height) + posY) );
 
 				double a = x; //partie reel
 				double b = y; //partie imaginaire
@@ -169,7 +170,6 @@ void Simulation::simulate() {
     for ( int i = 0; i < win_width; i++) {
         for ( int j = 0; j < win_height; j++)
         {
-
             image.setPixel(i, j, colorOfNumber(pixelNcount[i][j], pixelVal[i][j]));
         }
     }
@@ -186,21 +186,21 @@ int Simulation::inputHandler(Event event, sf::RenderWindow& window){
 		//zoom in 
 		if (event.mouseButton.button == Mouse::Left)
 		{
-			zoomScale /= 1.5;
 			Mouse mouse;
 			cout << "zoom " << 1 / zoomScale << endl;
-			posX = mapScale(mouse.getPosition(window).x, 0, window.getSize().x, -zoomScale + posX, zoomScale + posX);
-			posY = mapScale(mouse.getPosition(window).y, 0, window.getSize().y, -zoomScale + posY, zoomScale + posY);
+			posX = mapScale(mouse.getPosition(window).x, 0, window.getSize().x, (-zoomScale * static_cast<float>(win_width) + posX), (zoomScale * static_cast<float>(win_width) + posX));
+			posY = mapScale(mouse.getPosition(window).y, 0, window.getSize().y, (-zoomScale * static_cast<float>(win_height) + posY), (zoomScale * static_cast<float>(win_height) + posY));
+			zoomScale /= 1.5;
 			NeedToSimulate = true;
 		}
 		//zoom out
 		if (event.mouseButton.button == Mouse::Right)
 		{
-			zoomScale *= 1.5;
 			Mouse mouse;
 			cout << "zoom " << 1 / zoomScale << endl;
-			posX = mapScale(mouse.getPosition(window).x, 0, window.getSize().x, -zoomScale + posX, zoomScale + posX);
-			posY = mapScale(mouse.getPosition(window).y, 0, window.getSize().y, -zoomScale + posY, zoomScale + posY);
+			posX = mapScale(mouse.getPosition(window).x, 0, window.getSize().x, (-zoomScale * static_cast<float>(win_width) + posX), (zoomScale * static_cast<float>(win_width) + posX));
+			posY = mapScale(mouse.getPosition(window).y, 0, window.getSize().y, (-zoomScale * static_cast<float>(win_height) + posY), (zoomScale * static_cast<float>(win_height) + posY));
+			zoomScale *= 1.5;
 			NeedToSimulate = true;
 		}
 	}
