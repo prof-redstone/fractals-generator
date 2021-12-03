@@ -29,6 +29,15 @@ public:
 	double posJuliaY;
 	double zoomScaleJulia;
 
+
+	std::vector<sf::Color> listColor = { 
+		sf::Color(25, 7, 26),
+		sf::Color(0, 7, 100), 
+		sf::Color(211, 236, 248), 
+		sf::Color(255, 170, 0), 
+		sf::Color(66, 30, 15) 
+	};
+
 	Simulation();
 	Simulation(sf::RenderWindow& win);
 
@@ -47,7 +56,8 @@ public:
 	}
 
 	//tools function
-	static sf::Color colorOfNumber(int const& valI, int const& val2I);
+	static sf::Color colorOfNumber(int const& valI, int const& val2I, std::vector<sf::Color> const& listColor);
+	static sf::Color ColorSmoother(sf::Color const& c1, sf::Color const& c2, double const& x);
 	static sf::Color HSLtoRGB(double hueI, double const satI, double const darkI, double const alphaI=1);
 };
 

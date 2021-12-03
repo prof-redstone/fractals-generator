@@ -23,6 +23,8 @@ Simulation::Simulation() {
 	texture.update(image);
 	sprite.setTexture(texture);
 
+	
+
 	//creat 2dimension vector for 2 variables
 	vector<int> v1(win_width, 0);
 	vector<vector<int>> v11(win_height, v1);
@@ -50,7 +52,8 @@ Simulation::Simulation(sf::RenderWindow& win) {
     texture.create(win_width, win_height);
 	texture.update(image);
 	sprite.setTexture(texture);
-	
+
+
 	//creat 2dimension vector for 2 variables
 	vector<int> v1(win_width, 0);
 	vector<vector<int>> v11(win_height, v1);
@@ -154,6 +157,10 @@ void Simulation::simulate() {
 				pixelNcount[i][j] = n;
 				pixelVal[i][j] = sqrt(a * a + b * b);
 
+				if (n == maxIteration) {
+					pixelNcount[i][j] = 0;
+				}
+
 			}
 		}
 	}
@@ -181,6 +188,9 @@ void Simulation::simulate() {
 				pixelNcount[i][j] = n;
 				pixelVal[i][j] = sqrt(a * a + b * b);
 
+				if (n == maxIteration) {
+					pixelNcount[i][j] = 0;
+				}
 			}
 		}
 	}
@@ -189,8 +199,8 @@ void Simulation::simulate() {
     for ( int i = 0; i < win_width; i++) {
         for ( int j = 0; j < win_height; j++)
         {
-            image.setPixel(i, j, colorOfNumber(pixelNcount[i][j], pixelVal[i][j]));
-        }
+            image.setPixel(i, j, colorOfNumber(pixelNcount[i][j], pixelVal[i][j], listColor ) );
+        } 
     }
 
 	cout << " finished " << endl;
@@ -309,14 +319,37 @@ int Simulation::inputHandler(Event event, sf::RenderWindow& window){
 }
 
 //assigne color base on a float number
-sf::Color Simulation::colorOfNumber(int const& valI, int const& val2I) {
-	double val = valI + 1 - log(log(val2I)) / log(2);
-	//double val = valI ;
+sf::Color Simulation::colorOfNumber(int const& valI, int const& val2I, vector<Color> const& listColor) {
+	double val;
+	if (valI == 0) {
+		val = 0;
+		return Color(0,0,0);
+	}
+	else {
+		val = (valI + 1 - log(log(val2I)) / 0.6931471805599) * 0.04;
+	}
+
+	int Index1color = floor(fmod(val, listColor.size()));
+
+	int Index2color = floor(fmod(val, listColor.size())) + 1;
+	if (Index2color >= listColor.size()) { Index2color = 0; }//pour éviter les out of range
 	Color color;
-	color = Simulation::HSLtoRGB(val * 0.02, 0.1, 1);
+	color = ColorSmoother(listColor[Index1color], listColor[Index2color], fmod(val, 1));
+	//cout << val << endl;
+	//color = Simulation::HSLtoRGB(val, 0.1, 1);
 	//color = Color(static_cast<unsigned int>(255*cos(val+1)), static_cast<unsigned int>(255 * cos(val+2)), static_cast<unsigned int>(255 * cos(val)), 255);
 
 	return color;
+}
+
+sf::Color Simulation::ColorSmoother(Color const& c1, Color const& c2, double const& x){
+
+
+	Color c;
+	c.r = c1.r + (c2.r - c1.r) * x;
+	c.g = c1.g + (c2.g - c1.g) * x;
+	c.b = c1.b + (c2.b - c1.b) * x;
+	return c;
 }
 
 //simply converte color to HSL mode to RGB mode
