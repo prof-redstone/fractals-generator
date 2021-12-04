@@ -169,7 +169,6 @@ void Simulation::simulate() {
 		{
 
 			for (int j = 0; j < win_height; j++) {
-				// * (static_cast<float>(win_width) / static_cast<float>(win_height))
 				double x = Simulation::mapScale(i , 0, win_width, (-zoomScale*static_cast<float>(win_width ) + posX), (zoomScale*static_cast<float>(win_width ) + posX));
 				double y = Simulation::mapScale(j, 0, win_height, (-zoomScale * static_cast<float>(win_height) + posY) , (zoomScale * static_cast<float>(win_height) + posY) );
 
@@ -177,27 +176,26 @@ void Simulation::simulate() {
 				double b = y; //partie imaginaire
 				int n = 0; //nombre d'iteration
 
-
+				double newb;
 				while (n < maxIteration && a * a + b * b <= limit) {
-					double newb = (2 * a * b); //code degueu mais opti pour faire z^2 + c
+					newb = (2 * a * b); //code degueu mais opti pour faire z^2 + c
 					a = (a * a - b * b) + x;
 					b = newb + y;
 
 					n++;
 				}
 
-				pixelNcount[i][j] = n;
-				pixelVal[i][j] = sqrt(a * a + b * b);
-
 				if (n == maxIteration) {
 					pixelNcount[i][j] = 0;
+				}else {
+					pixelNcount[i][j] = n;
 				}
+				pixelVal[i][j] = sqrt(a * a + b * b);
 
 			}
 		}
 	}
 	else if (fractalType == 1) { //Julia set
-		cout << posJuliaY << endl;
 		for (int i = 0; i < win_width; i++)
 		{
 			for (int j = 0; j < win_height; j++) {
@@ -217,16 +215,15 @@ void Simulation::simulate() {
 					n++;
 				}
 
-				pixelNcount[i][j] = n;
-				pixelVal[i][j] = sqrt(a * a + b * b);
-
 				if (n == maxIteration) {
 					pixelNcount[i][j] = 0;
+				}else {
+					pixelNcount[i][j] = n;
 				}
+				pixelVal[i][j] = sqrt(a * a + b * b);
 			}
 		}
 	}
-	image.create(win_width, win_height, Color::Black);
     //creat image and color with array compute
     for ( int i = 0; i < win_width; i++) {
         for ( int j = 0; j < win_height; j++)
