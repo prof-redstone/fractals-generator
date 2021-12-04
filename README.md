@@ -2,8 +2,6 @@
 
 c++ generator of Mandelbrot and Julia set fractals
 
-
-
 # controle :
 
     **zoom** :
@@ -28,31 +26,27 @@ c++ generator of Mandelbrot and Julia set fractals
 
     - SFML
 
-
-
 # **Tests :**
 
 **Mandelbrot set :**
 
-![](C:\Users\tom\AppData\Roaming\marktext\images\2021-12-04-15-33-28-image.png)
+<img title="" src="images/1.png" alt="" width="500">
 
-![](C:\Users\tom\AppData\Roaming\marktext\images\2021-12-04-15-37-46-image.png)
+<img title="" src="images/2.png" alt="" width="500">
 
-![](C:\Users\tom\AppData\Roaming\marktext\images\2021-12-04-15-47-19-image.png)
+<img title="" src="images/5.png" alt="" width="500">
 
-  **Julia set : **
+**Julia set :**
 
-![](C:\Users\tom\AppData\Roaming\marktext\images\2021-12-04-15-41-19-image.png)
+<img title="" src="images/3.png" alt="" width="500">
 
-![](C:\Users\tom\AppData\Roaming\marktext\images\2021-12-04-15-44-26-image.png)
+<img title="" src="images/4.png" alt="" width="500">
 
-![](C:\Users\tom\AppData\Roaming\marktext\images\2021-12-04-15-52-22-image.png)
-
-
+<img title="" src="images/6.png" alt="" width="500">
 
 # Informations:
 
-    It run completely on CPU which main cause latency.
+    It runs completely on CPU which main cause latency.
 
     (First project on c++ and SFML)
 
