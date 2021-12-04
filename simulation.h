@@ -6,6 +6,8 @@
 #include <cmath>
 #include <sstream>//for larger precision with to_string(double)
 #include <iomanip>//for larger precision with to_string(double)
+#include <cstdlib>//to generate color
+#include <ctime>  //to initialize random
 
 class Simulation {
 public:
@@ -47,6 +49,7 @@ public:
 
 	void updateWindow(sf::RenderWindow& win);
 	void updateWindow(int x, int y);
+	void updateColorList(int const& param, std::vector<sf::Color> const& list = {});
 
 	int inputHandler(sf::Event event, sf::RenderWindow& win);
 

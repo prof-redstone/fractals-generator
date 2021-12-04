@@ -36,6 +36,14 @@ int main()
 
     
     simulation.updateWindow(window);
+    vector<Color> listColor = {
+        sf::Color(255, 7, 26),
+        sf::Color(255, 7, 100),
+        sf::Color(225, 236, 248),
+        sf::Color(255, 170, 0),
+        sf::Color(255, 30, 15)
+    };
+    simulation.updateColorList(2);
     simulation.simulate();
 
     while (window.isOpen()) {
@@ -67,6 +75,7 @@ void loadFont() {
     }
 }
 
+//si y'a besoins d'afficher un texte c'est près avec une police d'écriture 
 void SetText(Text& txt, string str = "", Color col = Color::White, int size = 26) {
     /*Text txt;
     SetText(txt, "Hello World", Color::Green, 50);

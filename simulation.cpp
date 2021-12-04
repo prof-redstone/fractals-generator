@@ -23,8 +23,6 @@ Simulation::Simulation() {
 	texture.update(image);
 	sprite.setTexture(texture);
 
-	
-
 	//creat 2dimension vector for 2 variables
 	vector<int> v1(win_width, 0);
 	vector<vector<int>> v11(win_height, v1);
@@ -52,7 +50,6 @@ Simulation::Simulation(sf::RenderWindow& win) {
     texture.create(win_width, win_height);
 	texture.update(image);
 	sprite.setTexture(texture);
-
 
 	//creat 2dimension vector for 2 variables
 	vector<int> v1(win_width, 0);
@@ -128,6 +125,41 @@ void Simulation::render(sf::RenderWindow& win) {
 	}
 }
 
+void Simulation::updateColorList(int const& param, std::vector<sf::Color> const& list) { // 0: reset ans set; 1 add ; 2 set color with logic and automatic
+	if (param == 0) {
+		listColor.clear();
+		for (int i = 0; i < list.size(); i++)
+		{
+			listColor.push_back(list[i]);
+		}
+	}
+	if (param == 1)
+	{
+		for (int i = 0; i < list.size(); i++)
+		{
+			listColor.push_back(list[i]);
+		}
+	}
+	if (param == 2) {
+		//intercalage de couleur blanc et noir entre chaque couleur de facon logique
+		listColor.clear();
+		std::srand(std::time(nullptr));
+		double lastHUE = 3.5;
+		for (int i = 0; i < 10; i++)
+		{
+			double nextHue = lastHUE + (rand() % 110 - (double)35) / (double)100;
+			lastHUE = nextHue;
+			listColor.push_back(HSLtoRGB(nextHue, 0.000001, (rand() % 10 + (double)80) / (double)100));
+			if (i % 2 == 1) {
+
+				listColor.push_back(Color(20, 20, 20));
+			}
+			else {
+				listColor.push_back(Color(220, 220, 220));
+			}
+		}
+	}
+}
 
 void Simulation::simulate() {
 	cout << "start simulate";
@@ -326,7 +358,7 @@ sf::Color Simulation::colorOfNumber(int const& valI, int const& val2I, vector<Co
 		return Color(0,0,0);
 	}
 	else {
-		val = (valI + 1 - log(log(val2I)) / 0.6931471805599) * 0.04;
+		val = ((double)valI + 1 - log(log(val2I)) / 0.6931471805599) * 0.04;
 	}
 
 	int Index1color = floor(fmod(val, listColor.size()));
@@ -335,7 +367,6 @@ sf::Color Simulation::colorOfNumber(int const& valI, int const& val2I, vector<Co
 	if (Index2color >= listColor.size()) { Index2color = 0; }//pour éviter les out of range
 	Color color;
 	color = ColorSmoother(listColor[Index1color], listColor[Index2color], fmod(val, 1));
-	//cout << val << endl;
 	//color = Simulation::HSLtoRGB(val, 0.1, 1);
 	//color = Color(static_cast<unsigned int>(255*cos(val+1)), static_cast<unsigned int>(255 * cos(val+2)), static_cast<unsigned int>(255 * cos(val)), 255);
 
@@ -343,12 +374,11 @@ sf::Color Simulation::colorOfNumber(int const& valI, int const& val2I, vector<Co
 }
 
 sf::Color Simulation::ColorSmoother(Color const& c1, Color const& c2, double const& x){
-
-
+	double val = 1 / (1 + pow(4, -7*(x - 0.5)));
 	Color c;
-	c.r = c1.r + (c2.r - c1.r) * x;
-	c.g = c1.g + (c2.g - c1.g) * x;
-	c.b = c1.b + (c2.b - c1.b) * x;
+	c.r = c1.r + (c2.r - c1.r) * val;
+	c.g = c1.g + (c2.g - c1.g) * val;
+	c.b = c1.b + (c2.b - c1.b) * val;
 	return c;
 }
 
