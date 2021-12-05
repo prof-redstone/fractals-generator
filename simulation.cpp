@@ -10,11 +10,11 @@ Simulation::Simulation() {
 	limit = 16;
 	zoomScale = 0.001;
 	posX = -0.5;
-	posY = 0;
+	posY = 0.;
 	JuliaX = -0.5;
 	JuliaY = -0.5;
-	posJuliaX = 0; //postion du milieu de l'ecran sur la fractal
-	posJuliaY = 0;
+	posJuliaX = 0.; //postion du milieu de l'ecran sur la fractal
+	posJuliaY = 0.;
 	zoomScaleJulia = 0.001;
 	win_width = 100;//use update window to change
 	win_height = 100;//use update window to change
@@ -33,7 +33,7 @@ Simulation::Simulation() {
 }
 //constructeur avec la window (pour la taille de la simulation)
 Simulation::Simulation(sf::RenderWindow& win) {
-	fractalType = 1;
+	fractalType = 0;
 	maxIteration = 100;
 	limit = 16;
 	zoomScale = 0.01;
@@ -178,7 +178,7 @@ void Simulation::simulate() {
 
 				double newb;
 				while (n < maxIteration && a * a + b * b <= limit) {
-					newb = (2 * a * b); //code degueu mais opti pour faire z^2 + c
+					newb = (2. * a * b); //code degueu mais opti pour faire z^2 + c
 					a = (a * a - b * b) + x;
 					b = newb + y;
 
@@ -195,7 +195,7 @@ void Simulation::simulate() {
 			}
 		}
 	}
-	else if (fractalType == 1) { //Julia set
+	if (fractalType == 1) { //Julia set
 		for (int i = 0; i < win_width; i++)
 		{
 			for (int j = 0; j < win_height; j++) {
@@ -208,7 +208,7 @@ void Simulation::simulate() {
 
 
 				while (n < maxIteration && a * a + b * b <= limit) {
-					double newb = (2 * a * b); //code degueu mais opti pour faire z^2 + c
+					double newb = (2. * a * b); //code degueu mais opti pour faire z^2 + c
 					a = (a * a - b * b) + JuliaX;
 					b = newb + JuliaY;
 
@@ -224,6 +224,41 @@ void Simulation::simulate() {
 			}
 		}
 	}
+	if (fractalType == 2) { //Burning ship set
+		for (int i = 0; i < win_width; i++)
+		{
+
+			for (int j = 0; j < win_height; j++) {
+				double x = Simulation::mapScale(i, 0, win_width, (-zoomScale * static_cast<float>(win_width) + posX), (zoomScale * static_cast<float>(win_width) + posX));
+				double y = Simulation::mapScale(j, 0, win_height, (-zoomScale * static_cast<float>(win_height) + posY), (zoomScale * static_cast<float>(win_height) + posY));
+
+				double a = x; //partie reel
+				double b = y; //partie imaginaire
+				int n = 0; //nombre d'iteration
+
+				double newb;
+				double newa;
+				while (n < maxIteration && a * a + b * b <= limit) {
+					newa = (a * a - b * b);
+					newb = abs(2 * a * b);
+					a = newa + x;
+					b = newb + y;
+
+					n++;
+				}
+
+				if (n == maxIteration) {
+					pixelNcount[i][j] = 0;
+				}
+				else {
+					pixelNcount[i][j] = n;
+				}
+				pixelVal[i][j] = sqrt(a * a + b * b);
+
+			}
+		}
+	}
+	
     //creat image and color with array compute
     for ( int i = 0; i < win_width; i++) {
         for ( int j = 0; j < win_height; j++)
@@ -244,7 +279,7 @@ int Simulation::inputHandler(Event event, sf::RenderWindow& window){
 		//zoom in 
 		if (event.mouseButton.button == Mouse::Left)
 		{
-			if (fractalType == 0)
+			if (fractalType == 0 || fractalType == 2)
 			{
 				Mouse mouse;
 				cout << "zoom " << 1 / zoomScale << endl;
@@ -264,7 +299,7 @@ int Simulation::inputHandler(Event event, sf::RenderWindow& window){
 		//zoom out
 		if (event.mouseButton.button == Mouse::Right)
 		{
-			if (fractalType == 0)
+			if (fractalType == 0 || fractalType == 2)
 			{
 				Mouse mouse;
 				cout << "zoom " << 1 / zoomScale << endl;
@@ -328,6 +363,28 @@ int Simulation::inputHandler(Event event, sf::RenderWindow& window){
 			}
 			NeedToSimulate = true;
 		}
+		//switch between mandelbrot and burning ship
+		if (event.key.code == Keyboard::B) {
+			if (fractalType == 0 || fractalType == 1) {
+				fractalType = 2;
+				zoomScale = 0.002;
+				posX = -0.5;
+				posY = -0.5;
+
+			}else {
+				fractalType = 0;
+				zoomScale = 0.001;
+				posX = -0.5;
+				posY = 0.;
+
+			}
+			NeedToSimulate = true;
+		}
+		//change and reload color list
+		if (event.key.code == Keyboard::R) {
+			updateColorList(2);
+			NeedToSimulate = true;
+		}
 	}
 	//window change size event to adapte image to window
 	if (event.type == sf::Event::Resized)
@@ -355,7 +412,7 @@ sf::Color Simulation::colorOfNumber(int const& valI, int const& val2I, vector<Co
 		return Color(0,0,0);
 	}
 	else {
-		val = ((double)valI + 1 - log(log(val2I)) / 0.6931471805599) * 0.04;
+		val = ((double)valI + 1 - log(log(val2I)) / 0.6931471805599) * 0.03;
 	}
 
 	int Index1color = floor(fmod(val, listColor.size()));
@@ -371,7 +428,8 @@ sf::Color Simulation::colorOfNumber(int const& valI, int const& val2I, vector<Co
 }
 
 sf::Color Simulation::ColorSmoother(Color const& c1, Color const& c2, double const& x){
-	double val = 1 / (1 + pow(4, -7*(x - 0.5)));
+	//double val = 1 / (1 + pow(4, -7*(x - 0.5)));
+	double val = x;
 	Color c;
 	c.r = c1.r + (c2.r - c1.r) * val;
 	c.g = c1.g + (c2.g - c1.g) * val;

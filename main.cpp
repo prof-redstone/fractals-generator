@@ -37,13 +37,13 @@ int main()
     
     simulation.updateWindow(window);
     vector<Color> listColor = {
-        sf::Color(255, 7, 26),
-        sf::Color(255, 7, 100),
-        sf::Color(225, 236, 248),
-        sf::Color(255, 170, 0),
-        sf::Color(255, 30, 15)
+        sf::Color(0, 215, 255),
+        sf::Color(0, 110, 255),
+        sf::Color(0, 0, 255),
+        sf::Color(160, 0, 255),
+        sf::Color(0, 0, 255),
     };
-    simulation.updateColorList(2);
+    simulation.updateColorList(0,listColor);
     simulation.simulate();
 
     while (window.isOpen()) {

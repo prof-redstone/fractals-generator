@@ -9,6 +9,8 @@
 #include <cstdlib>//to generate color
 #include <ctime>  //to initialize random
 
+#include <complex>
+
 class Simulation {
 public:
 	bool ready = false;
@@ -17,7 +19,7 @@ public:
 	sf::Sprite sprite;
 	std::vector<std::vector<int>> pixelNcount; //nb d'iteration avant que ça diverge
 	std::vector<std::vector<double>> pixelVal; //modulo de la valeur à la divergence (pour avoir un truc plus lisse)
-	uint8_t fractalType; //juste mandelbrot for the moment (0)
+	uint8_t fractalType; //mandelbrot 0; Julia set 1; Burning ship 2;
 	int win_width;//taille de la window
 	int win_height;
 	int maxIteration;
